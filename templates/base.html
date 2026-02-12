@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client-Contact Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="container">
+            <h1 class="app-title">Client-Contact Manager</h1>
+            <nav class="nav">
+                <a href="{{ url_for('clients.list_clients') }}">Clients</a>
+                <a href="{{ url_for('contacts.list_contacts') }}">Contacts</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Simple tab handling: elements with data-tab-target control .tab-pane
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabContainers = document.querySelectorAll(".tabs");
+
+            tabContainers.forEach(function (tabsWrapper) {
+                const buttons = tabsWrapper.querySelectorAll("[data-tab-target]");
+                const panes = tabsWrapper.parentElement.querySelectorAll(".tab-pane");
+
+                buttons.forEach(function (btn) {
+                    btn.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        const targetId = btn.getAttribute("data-tab-target");
+
+                        buttons.forEach(b => b.classList.remove("active"));
+                        panes.forEach(p => p.classList.remove("active"));
+
+                        btn.classList.add("active");
+                        const targetPane = tabsWrapper.parentElement.querySelector("#" + targetId);
+                        if (targetPane) {
+                            targetPane.classList.add("active");
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

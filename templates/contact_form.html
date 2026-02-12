@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ 'New Contact' if is_new else 'Edit Contact' }}</h2>
+    <a href="{{ url_for('contacts.list_contacts') }}" class="btn">Back to Contacts</a>
+</div>
+
+<div class="card">
+    <div class="tabs">
+        <button class="tab-button active" data-tab-target="contact-general-tab">General</button>
+        <button class="tab-button" data-tab-target="contact-clients-tab">Client(s)</button>
+    </div>
+
+    <div class="tab-content">
+        <div id="contact-general-tab" class="tab-pane active">
+            <form method="post" action="{{ url_for('contacts.create_contact') if is_new else url_for('contacts.update_contact', contact_id=contact['id']) }}">
+                <div class="form-group">
+                    <label for="name">Name<span class="required">*</span></label>
+                    <input type="text" id="name" name="name" value="{{ form_data.get('name', '') }}" required>
+                    {% if errors.get('name') %}
+                        <div class="error">{{ errors['name'] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="surname">Surname<span class="required">*</span></label>
+                    <input type="text" id="surname" name="surname" value="{{ form_data.get('surname', '') }}" required>
+                    {% if errors.get('surname') %}
+                        <div class="error">{{ errors['surname'] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email<span class="required">*</span></label>
+                    <input type="email" id="email" name="email" value="{{ form_data.get('email', '') }}" required>
+                    {% if errors.get('email') %}
+                        <div class="error">{{ errors['email'] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Save</button>
+                </div>
+            </form>
+
+            {% if not is_new %}
+            <form method="post"
+                  action="{{ url_for('contacts.delete_contact', contact_id=contact['id']) }}"
+                  style="display:inline"
+                  onsubmit="return confirm('Are you sure you want to delete this contact?');">
+                <button type="submit" class="btn">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div id="contact-clients-tab" class="tab-pane">
+            {% if is_new %}
+                <p>Save contact to link clients.</p>
+            {% else %}
+                {% if not linked_clients %}
+                    <p>No client(s) found.</p>
+                {% else %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Client name</th>
+                                <th class="text-left">Client code</th>
+                                <th class="text-left"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for client in linked_clients %}
+                            <tr>
+                                <td class="text-left">{{ client['name'] }}</td>
+                                <td class="text-left">{{ client['client_code'] }}</td>
+                                <td class="text-left">
+                                    <a href="{{ url_for('contacts.unlink_client', contact_id=contact['id'], client_id=client['id']) }}">Unlink</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                <hr>
+
+                <form method="post" action="{{ url_for('contacts.link_client', contact_id=contact['id']) }}">
+                    <div class="form-group inline">
+                        <label for="client_id">Link existing client</label>
+                        <select id="client_id" name="client_id">
+                            {% for client in available_clients %}
+                                <option value="{{ client['id'] }}">{{ client['name'] }} ({{ client['client_code'] }})</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn">Link</button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

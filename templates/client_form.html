@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ 'New Client' if is_new else 'Edit Client' }}</h2>
+    <a href="{{ url_for('clients.list_clients') }}" class="btn">Back to Clients</a>
+</div>
+
+<div class="card">
+    <div class="tabs">
+        <button class="tab-button active" data-tab-target="client-general-tab">General</button>
+        <button class="tab-button" data-tab-target="client-contacts-tab">Contact(s)</button>
+    </div>
+
+    <div class="tab-content">
+        <div id="client-general-tab" class="tab-pane active">
+            <form method="post" action="{{ url_for('clients.create_client') if is_new else url_for('clients.update_client', client_id=client['id']) }}">
+                <div class="form-group">
+                    <label for="name">Name<span class="required">*</span></label>
+                    <input type="text" id="name" name="name" value="{{ form_data.get('name', '') }}" required>
+                    {% if errors.get('name') %}
+                        <div class="error">{{ errors['name'] }}</div>
+                    {% endif %}
+                </div>
+
+                {% if not is_new %}
+                <div class="form-group">
+                    <label for="client_code">Client Code</label>
+                    <input type="text" id="client_code" name="client_code" value="{{ client['client_code'] }}" readonly>
+                </div>
+                {% endif %}
+
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Save</button>
+                </div>
+            </form>
+
+            {% if not is_new %}
+            <form method="post"
+                  action="{{ url_for('clients.delete_client', client_id=client['id']) }}"
+                  style="display:inline"
+                  onsubmit="return confirm('Are you sure you want to delete this client?');">
+                <button type="submit" class="btn">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div id="client-contacts-tab" class="tab-pane">
+            {% if is_new %}
+                <p>Save client to link contacts.</p>
+            {% else %}
+                {% if not linked_contacts %}
+                    <p>No contacts found.</p>
+                {% else %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Contact Full Name</th>
+                                <th class="text-left">Contact Email</th>
+                                <th class="text-left"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for contact in linked_contacts %}
+                            <tr>
+                                <td class="text-left">{{ contact['surname'] }} {{ contact['name'] }}</td>
+                                <td class="text-left">{{ contact['email'] }}</td>
+                                <td class="text-left">
+                                    <a href="{{ url_for('clients.unlink_contact', client_id=client['id'], contact_id=contact['id']) }}">Unlink</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                <hr>
+
+                <form method="post" action="{{ url_for('clients.link_contact', client_id=client['id']) }}">
+                    <div class="form-group inline">
+                        <label for="contact_id">Link existing contact</label>
+                        <select id="contact_id" name="contact_id">
+                            {% for contact in available_contacts %}
+                                <option value="{{ contact['id'] }}">{{ contact['surname'] }} {{ contact['name'] }} ({{ contact['email'] }})</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn">Link</button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

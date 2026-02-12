@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Contacts</h2>
+    <a href="{{ url_for('contacts.new_contact') }}" class="btn primary">Create New Contact</a>
+</div>
+
+{% if not contacts %}
+    <p>No contact(s) found.</p>
+{% else %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="text-left">Name</th>
+                <th class="text-left">Surname</th>
+                <th class="text-left">Email</th>
+                <th class="text-center">No. of linked clients</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td class="text-left">
+                    <a href="{{ url_for('contacts.edit_contact', contact_id=contact['id']) }}">{{ contact['name'] }}</a>
+                </td>
+                <td class="text-left">{{ contact['surname'] }}</td>
+                <td class="text-left">{{ contact['email'] }}</td>
+                <td class="text-center">{{ contact['client_count'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}
+
