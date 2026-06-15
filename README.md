@@ -2,7 +2,7 @@ CLIENT–CONTACT MANAGER
 This is a small Flask-based CRUD application built to demonstrate how to manage Clients and Contacts using a many-to-many relationship.
 
 The application allows users to create clients and contacts, link them together, and manage those links in a simple and structured way.
-
+ 
 WHAT THE APPLICATION DOES
 The application allows users to create and manage clients.
 The application allows users to create and manage contacts.
