@@ -23,7 +23,7 @@ Installation
 From the project folder (Client Management):
 
 pip install flask
-
+ 
 Database initialization
 Before running the app, initialize the database:
 python init_db_run.py
